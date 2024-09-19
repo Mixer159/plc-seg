@@ -16,6 +16,8 @@ export async function getServerSideProps() {
       ? `https://${process.env.VERCEL_URL}`
       : "http://localhost:3000";
 
+    console.log("Fetching from:", baseUrl); // Add this line for debugging
+
     const res = await fetch(`${baseUrl}/api/availablePages`);
 
     if (res.status === 401) {
