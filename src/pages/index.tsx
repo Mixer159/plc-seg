@@ -12,11 +12,15 @@ import Link from "next/link";
 
 export async function getServerSideProps() {
   try {
-    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
-    const host = process.env.VERCEL_URL || "localhost:3000";
-    const baseUrl = `${protocol}://${host}`;
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : "http://localhost:3000";
 
     const res = await fetch(`${baseUrl}/api/availablePages`);
+
+    if (res.status === 401) {
+      throw new Error("Unauthorized access. Please check your credentials.");
+    }
 
     if (!res.ok) {
       throw new Error(`API request failed with status ${res.status}`);
@@ -31,7 +35,12 @@ export async function getServerSideProps() {
     return { props: { availablePages } };
   } catch (error: any) {
     console.error("Error fetching available pages:", error);
-    return { props: { availablePages: [], error: error.message } };
+    return {
+      props: {
+        availablePages: [],
+        error: error.message || "An unexpected error occurred",
+      },
+    };
   }
 }
 
