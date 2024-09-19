@@ -9,13 +9,23 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@chakra-ui/icon": "^3.2.0",
+    "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
+    "browser-image-compression": "^2.0.2",
     "framer-motion": "^11.2.4",
+    "fs": "0.0.1-security",
+    "lodash": "^4.17.21",
     "next": "14.2.3",
+    "nspell": "^2.1.5",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-calendar": "^5.0.0",
+    "react-dom": "^18.3.1",
+    "react-dropzone": "^14.2.3",
+    "sharp": "^0.33.5",
+    "tesseract.js": "^5.1.1"
   },
   "devDependencies": {
     "@types/node": "^20",
