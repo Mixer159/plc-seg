@@ -16,9 +16,13 @@ export async function getServerSideProps() {
       ? `https://${process.env.VERCEL_URL}`
       : "http://localhost:3000";
 
-    console.log("Fetching from:", baseUrl); // Add this line for debugging
+    console.log("Fetching from:", baseUrl);
 
-    const res = await fetch(`${baseUrl}/api/availablePages`);
+    const fullUrl = `${baseUrl}/api/availablePages`;
+    console.log("Full URL:", fullUrl);
+
+    const res = await fetch(fullUrl);
+    console.log("Response status:", res.status);
 
     if (res.status === 401) {
       throw new Error("Unauthorized access. Please check your credentials.");
@@ -36,7 +40,7 @@ export async function getServerSideProps() {
     const availablePages = await res.json();
     return { props: { availablePages } };
   } catch (error: any) {
-    console.error("Error fetching available pages:", error);
+    console.error("Error in getServerSideProps:", error);
     return {
       props: {
         availablePages: [],
