@@ -7,7 +7,7 @@ import {
   ListItem,
   Highlight,
 } from "@chakra-ui/react";
-import debounce from "lodash/debounce"; // You'll need to install lodash
+import debounce from "lodash/debounce";
 
 export default function CzechSpellChecker() {
   const [text, setText] = useState("");

@@ -1,54 +1,93 @@
-// pages/index.tsx
-import { useState } from "react";
-import { Box, Button, Checkbox, VStack } from "@chakra-ui/react";
-import SevenSegmentDisplay from "../components/SevenSegmentDisplay";
+import { useState, useEffect } from "react";
+import {
+  VStack,
+  HStack,
+  Input,
+  Button,
+  Text,
+  Link as ChakraLink,
+  Box,
+} from "@chakra-ui/react";
+import Link from "next/link";
 
-const Home = () => {
-  const [segments, setSegments] = useState([
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ]);
+export async function getServerSideProps() {
+  try {
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+    const host = process.env.VERCEL_URL || "localhost:3000";
+    const baseUrl = `${protocol}://${host}`;
 
-  const toggleSegment = (index: number) => {
-    const newSegments = [...segments];
-    newSegments[index] = !newSegments[index];
-    setSegments(newSegments);
-  };
+    const res = await fetch(`${baseUrl}/api/availablePages`);
 
-  const generateBitNumber = () => {
-    return (
-      "0b" +
-      segments
-        .map((segment) => (segment ? "1" : "0"))
-        .reverse()
-        .join("")
-    );
-  };
+    if (!res.ok) {
+      throw new Error(`API request failed with status ${res.status}`);
+    }
+
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("API response is not JSON");
+    }
+
+    const availablePages = await res.json();
+    return { props: { availablePages } };
+  } catch (error: any) {
+    console.error("Error fetching available pages:", error);
+    return { props: { availablePages: [], error: error.message } };
+  }
+}
+
+const Home = ({
+  availablePages,
+  error,
+}: {
+  availablePages: number[];
+  error?: string;
+}) => {
+  const [customPage, setCustomPage] = useState("");
+  const maxPage = Math.max(...availablePages);
 
   return (
-    <VStack spacing={4}>
-      <SevenSegmentDisplay segments={segments} toggleSegment={toggleSegment} />
-      <Box>
-        {["A", "B", "C", "D", "E", "F", "G"].map((label, index) => (
-          <Checkbox
-            key={index}
-            isChecked={segments[index]}
-            onChange={() => toggleSegment(index)}
-            mr={2}
+    <Box p={8} maxWidth="800px" margin="auto">
+      <VStack spacing={6} align="stretch">
+        <Text fontSize="2xl" fontWeight="bold" textAlign="center">
+          Hodina Page Finder
+        </Text>
+
+        {error ? (
+          <Text color="red.500">{error}</Text>
+        ) : (
+          <VStack spacing={2} align="stretch">
+            {availablePages.map((pageNum: number) => (
+              <ChakraLink
+                key={pageNum}
+                as={Link}
+                href={`/hodina${pageNum}`}
+                p={2}
+                borderRadius="md"
+                bg="gray.100"
+                _hover={{ bg: "gray.200" }}
+              >
+                Hodina {pageNum}
+              </ChakraLink>
+            ))}
+          </VStack>
+        )}
+
+        <HStack>
+          <Input
+            placeholder="Enter custom page number"
+            value={customPage}
+            onChange={(e) => setCustomPage(e.target.value)}
+          />
+          <Button
+            as={Link}
+            href={`/hodina${customPage}`}
+            isDisabled={!customPage || parseInt(customPage) > maxPage}
           >
-            Segment {label}
-          </Checkbox>
-        ))}
-      </Box>
-      <Button onClick={() => alert(`Bit Number: ${generateBitNumber()}`)}>
-        Generate Bit Number
-      </Button>
-    </VStack>
+            Go to Page
+          </Button>
+        </HStack>
+      </VStack>
+    </Box>
   );
 };
 
